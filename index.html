@@ -1,0 +1,22 @@
+---
+layout: default
+title: .oO(squaremobius)
+---
+
+<section id="banner">
+  <h1>squaremobius</h1>
+</section>
+<section id="elsewise">
+  <h3>elsewise</h3>
+  {% include elsewise.html %}
+</section>
+<section id="posts">
+  <h3>Posts</h3>
+  <ol>
+  {% for post in site.posts %}
+    <li><time>{{ post.date | date_to_string }}</time>
+        <a href="{{ post.url }}">{{ post.title }}</a>
+    </li>
+  {% endfor %}
+  </ol>
+</section>
