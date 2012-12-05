@@ -1,7 +1,7 @@
 /*
  Reset. Everyone does this these days apparently.
 */
-* {
+body, table {
     margin: 0;
     padding: 0;
 }
@@ -82,7 +82,12 @@ License: http://www.fontsquirrel.com/license/Colaborate
    http://colorschemedesigner.com/#1S62L-------- */
 
 body {
+    background-color: #fafffe;
+}
+
+#content {
     background-color: #ffffec;
+    background-color: #fafffe;
     color: #4d2500;
 }
 
@@ -103,4 +108,56 @@ body {
 strong, h1, h2, h3 {
     font-family: 'ColaborateRegular';
     font-weight: normal;
+}
+
+/* Layout */
+
+/* 10px gutters and 80px columns
+*/
+
+#content { /* 2 columns and 2 gutters over and 7 columns wide */
+    margin-left: 180px;
+    width: 610px;
+    /* */
+    padding-top: 14px;
+}
+
+/* defaults: gutter then 6 columns */
+#content section, #content header, #content footer {
+    margin-left: 10px;
+    width: 530px;
+}
+
+#content section#posts {
+    margin-left: 0;
+    width: 600px;
+    padding-left: 10px;
+    padding-bottom: 14px;
+    border: 2px solid #1d1d00;
+    border-width: 2px 0 0 0;
+    background-color: #ffe8d2;
+}
+
+section#posts ol {
+    list-style: none;
+}
+
+#content footer.elsewise {
+    margin-left: 0;
+    width: 600px;
+    padding-left: 10px;
+    border: 2px solid #1d1d00;
+    border-width: 2px 0 2px 0;
+    background-color: #fff6ed;
+}
+
+#content footer.copyright {
+    margin-left: 0;
+    width: 600px;
+    padding-left: 10px;
+    padding-bottom: 16px;
+}
+
+header#banner {
+    margin-left: 180px;
 }

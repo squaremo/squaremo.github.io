@@ -8,16 +8,19 @@
     <header id="banner">
       <h1>.oO(squaremo)</h1>
     </header>
-    {{ content }}
-    <footer class="elsewise">
-      {% include elsewise.html %}
-    </footer>
-    <footer class="copyright">
-      <p>(C) Michael Bridgen 2012</p>
-      <p>
-        Generated using
-        <a href="http://github.com/mojombo/jekyll">Jekyll</a>
-      </p>
-    </footer>
+    <article id="content">
+      {{ content }}
+      <footer class="elsewise">
+        <h3>elsewise</h3>
+        {% include elsewise.html %}
+      </footer>
+      <footer class="copyright">
+        <p>&copy; Michael Bridgen 2012</p>
+        <p>
+          Generated using
+          <a href="http://github.com/mojombo/jekyll">Jekyll</a>
+        </p>
+      </footer>
+    </article>
   </body>
 </html>

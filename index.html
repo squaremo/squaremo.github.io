@@ -3,12 +3,13 @@ layout: default
 title: .oO(squaremobius)
 ---
 
-<section id="banner">
-  <h1>squaremobius</h1>
-</section>
-<section id="elsewise">
-  <h3>elsewise</h3>
-  {% include elsewise.html %}
+<section id="latest">
+  {% assign first_post = site.posts.first %}
+  <article class="post">
+    <h2><a href="{{ first_post.url }}">{{ first_post.title }}</a></h2>
+    <time>{{ first_post.date | date_to_string }}</time>
+    {{ first_post.content }}
+  </article>
 </section>
 <section id="posts">
   <h3>Posts</h3>
