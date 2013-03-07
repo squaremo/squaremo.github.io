@@ -103,6 +103,7 @@ a:visited {
 body {
     font-family: 'ColaborateLightRegular';
     font-size: 12pt;
+    line-height: 1.30em;
 }
 
 strong, h1, h2, h3 {
@@ -148,7 +149,7 @@ section#posts ol {
     padding-left: 10px;
     border: 2px solid #1d1d00;
     border-width: 2px 0 2px 0;
-    background-color: #fff6ed;
+/*    background-color: #fff6ed; */
 }
 
 #content footer.copyright {
