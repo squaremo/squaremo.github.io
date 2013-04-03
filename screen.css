@@ -162,3 +162,9 @@ section#posts ol {
 header#banner {
     margin-left: 180px;
 }
+
+/* Specificals */
+
+.gist {
+    font-size: 10pt;
+}
