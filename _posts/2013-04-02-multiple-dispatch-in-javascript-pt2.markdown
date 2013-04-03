@@ -4,10 +4,11 @@ layout: post
 title: Multiple dispatch in JavaScript, part deux
 ---
 
-In the [last post](multiple-dispatch-in-javascript.html) I described
-some of the specifics of *implementing* multimethods in JavaScript,
-but I didn't talk about *using* multimethods in JavaScript or give any
-examples. Here I'm going to demonstrate a few uses of multimethods.
+In the [last post](/2013/02/18/multiple-dispatch-in-js.html) I
+described some of the specifics of *implementing* multimethods in
+JavaScript, but I didn't talk about *using* multimethods in JavaScript
+or give any examples. Here I'm going to demonstrate a few uses of
+multimethods.
 
 Before I start, one peculiarity I didn't mention in the previous post
 is garbage collecting methods. Method lookup tables are kept as
