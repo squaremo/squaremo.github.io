@@ -98,17 +98,32 @@ a:visited {
     color: #684080;
 }
 
+pre, code {
+    background-color: #f6e6ff;
+}
 /* fonts */
 
+pre {
+    padding: 5px;
+}
+
+code {
+    padding: 2px;
+}
+
 body {
-    font-family: 'ColaborateLightRegular';
+/*    font-family: 'ColaborateLightRegular'; */
     font-size: 12pt;
     line-height: 1.30em;
 }
 
 strong, h1, h2, h3 {
     font-family: 'ColaborateRegular';
-    font-weight: normal;
+}
+
+code {
+    font-family: monaco, monospace;
+    font-size: 10pt;
 }
 
 /* Layout */
@@ -116,22 +131,22 @@ strong, h1, h2, h3 {
 /* 10px gutters and 80px columns
 */
 
-#content { /* 2 columns and 2 gutters over and 7 columns wide */
+#content { /* 2 columns and 2 gutters over and 8 columns wide */
     margin-left: 180px;
-    width: 610px;
+    width: 700px;
     /* */
     padding-top: 14px;
 }
 
-/* defaults: gutter then 6 columns */
+/* defaults: gutter then 7 columns */
 #content section, #content header, #content footer {
     margin-left: 10px;
-    width: 530px;
+    width: 620px;
 }
 
 #content section#posts {
     margin-left: 0;
-    width: 600px;
+    width: 700px;
     padding-left: 10px;
     padding-bottom: 14px;
     border: 2px solid #1d1d00;
@@ -145,7 +160,7 @@ section#posts ol {
 
 #content footer.elsewise {
     margin-left: 0;
-    width: 600px;
+    width: 700px;
     padding-left: 10px;
     border: 2px solid #1d1d00;
     border-width: 2px 0 2px 0;
@@ -154,7 +169,7 @@ section#posts ol {
 
 #content footer.copyright {
     margin-left: 0;
-    width: 600px;
+    width: 700px;
     padding-left: 10px;
     padding-bottom: 16px;
 }
@@ -165,6 +180,8 @@ header#banner {
 
 /* Specificals */
 
-.gist {
+/* Not sire I can get this to apply */
+.gist .gist-file pre.line-pre {
     font-size: 10pt;
+    font-family: monaco, monospace;
 }
