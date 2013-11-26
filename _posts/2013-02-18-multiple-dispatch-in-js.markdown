@@ -38,8 +38,8 @@ constructors and prototypes to create chains of delegation that also
 look like type hierarchies -- or just outright type hierarchies.
 
 Here's a naïve implementation of the central method lookup algorithm:
-<script src="https://gist.github.com/squaremo/5086573.js?file=method_lookup.js">
-</script>
+
+{% gist squaremo/5086573 method_lookup.js %}
 
 Of the free names there, `get_table` gets the method lookup table for
 a value and role (argument position), `delegate` gets a value's
@@ -76,16 +76,14 @@ not usually a property of a constructed object, but rather, a property
 given to the automagically generated prototype of a function, which is
 then 'inherited' by the object.
 
-<script src="https://gist.github.com/squaremo/5086573.js?file=constructor_inheritance.js">
-</script>
+{% gist squaremo/5086573 constructor_inheritance.js %}
 
 If, then, you do what comes naturally and assign to a function's
 prototype property in order to create a chain of delegation, the
 constructor property is inherited from whatever you assigned, and not
 the automagic prototype.
 
-<script src="https://gist.github.com/squaremo/5086573.js?file=constructor_inheritance_2.js">
-</script>
+{% gist squaremo/5086573 constructor_inheritance_2.js %}
 
 Anyway. This constructor thing gives me a choice: since they are often
 used in the delegation chain style, they make a nice way of naming

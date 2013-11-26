@@ -8,13 +8,14 @@ than four encoding schemes, all _slightly different_, with overlapping
 sets of primitive types (which are helpfully given different names in
 different places). Each of these needs its own _slightly different_
 approach, although certain things are common of course. What follows
-is an explanation of the various encodings, their quirks, and their
-implementation in [amqplib][], my AMQP client library for Node.JS.
+is an explanation of the various encoding schemes, their quirks, and
+their implementation in [amqplib][], my AMQP client library for
+Node.JS.
 
 ### Parsing frames
 
-At the bottom layer, bytes on the wire are in *frames*, of a handful
-of set layouts. Each frame looks like this:
+At the bottom layer, bytes on the wire are sent in sequential
+*frames*, of a handful of set layouts. Each frame looks like this:
 
     Frame format:
     
@@ -31,29 +32,36 @@ heartbeats and some performatives -- always have a channel of `0` (so
 you could argue that `channel` ought to be part of the next
 layer). The `frame-end` is a delimiter of set value `0xCE`, which is a
 intended to act as a check that the frame size really is the frame
-size; of course, the byte in that position might have that value by
-coincidence. (Luckily, the byte spent on the redundant frame delimiter
-is more than saved elsewhere by two _slightly different_ ridiculous
-bit-packing algorithms[1](#note1).)
+size, to save having to parse the frame to check that it's
+valid. (Even though it'll have to be parsed anyway; of course, the
+byte in that position might have that value by coincidence. Luckily,
+the byte spent on the redundant frame delimiter is more than saved
+elsewhere by two _slightly different_ ridiculous bit-packing
+algorithms[1](#note1).)
 
-In amqplib, the incoming byte stream is of course a `Readable`;
+Naturally, in amqplib, the incoming byte stream is a `Readable`, and
 amqplib uses a [bitsyntax][] pattern to break it into frames,
 proceeding only when it has a full and correctly-delimited frame. It
-tests the size and delimiter explicitly rather than including them in
-the pattern -- we don't want to get a huge, bogus size and read from
-the socket forever trying to accumulate enough bytes.
+explicitly checks the size against a maximum then slices, rather than
+doing the slice in the pattern -- we don't want to get a huge, bogus
+size and read from the socket forever trying to accumulate enough
+bytes.
 
 <script src="https://gist.github.com/squaremo/7373943.js?file=frame_parse.js">
 </script>
 
-If the match fails (returns `false`) an outer loop reads the next
-chunk of bytes and tries again with all the bytes thus far
-collected. It is perhaps slightly sub-optimal to try the full match
-every time new bytes come in. An improvement might be to have distinct
-header-reading and payload-accumulation states.
+If there are too few bytes the match will fail (return `false`), in
+which case an outer loop reads the next chunk of bytes and tries again
+with all the bytes thus far collected.
 
 By the way, using bitsyntax is just a compact and convenient means of
-code generation; one could certainly write equivalent code by hand.
+code generation, and one could certainly write equivalent code by
+hand. It is perhaps slightly sub-optimal to try the full match every
+time new bytes come in. An improvement might be to have distinct
+header-reading and payload-accumulation states, which would probably
+make bitsyntax overkill here. (While writing this I checked whether
+bitsyntax would exit early if it has a fixed-size pattern and too few
+bytes -- it doesn't. One for the TODO list.)
 
 ### Decoding and encoding methods and headers
 
@@ -64,11 +72,11 @@ similar encoding schemes with a statically-defined sequence of fields
 per method or header, the encoded values of which are simply
 concatenated.
 
-Since I have all the method and header definitions in a JSON file, I
-can mechanically generate encoding and decoding procedures for them. I
-could hand-code them, but there are quite a few methods and it would
-take a long and boring time, and I doubt there are any benefits to
-doing so, optimisation- or other-wise.
+Since I have all the method and header definitions in a
+[JSON file][amqp-json], I can mechanically generate encoding and
+decoding procedures for them. I could hand-code them, but there are
+quite a few methods and it would take a long and boring time, and I
+doubt there are any benefits to doing so, optimisation- or other-wise.
 
 The definitions look like this:
 
@@ -86,20 +94,28 @@ A method frame payload starts with a 32-bit integer denoting the
 specific method, then the encoded fields for that method concatenated
 together. Here's an encoded ConnectionStart method:
 
-<script src="https://gist.github.com/squaremo/7373943.js?file=frame_eg">
-</script>
+{% gist squaremo/7373943 frame_eg %}
+
+Sadly, I can't easily use bitsyntax here, because the field encodings
+are rather ... idiosyncratic. I could do some precalculation (of
+sizes, and packed bit fields), then construct the whole frame with a
+pattern. But, I have to generate code anyway, so I may as well do the
+whole lot.
 
 After some unsavoury string concatenation (view through your fingers
 [here][amqplib-generate]), something like the following decoder
 procedure is generated for each method:
 
-<script src="https://gist.github.com/squaremo/7373943.js?file=decode_start.js">
-</script>
+{% gist squaremo/7373943 decode_start.js %}
 
 This is deliberately simple-minded, using local variables as registers
 of a sort, to keep the code-generating code uniform per stanza and
 make debugging easier. In principle. The result is run through uglify
 to tighten it up; or, at least, to pretty-print it.
+
+Note that you won't see the _generating_ code in the npm package, only
+the _generated_ code (which is likewise not in the git repo). The code
+generation is done as a prepublish script.
 
 Encoder procedures are also generated. These are not symmetric to the
 decoders: they generate a whole frame at once. Otherwise, the method
@@ -115,11 +131,12 @@ not without me implementing one), I use a "safely-sized" buffer, one
 that is very likely to be big enough in practice. There's a few
 improvements I think can be made in this respect:
 
- - Given the values to be encoded, I could allocate a buffer to
-   size. A complication is tables (and arrays, though they only appear
-   inside tables), for which the size can only be calculated with an
-   encoding pass. Still, since I encode those into their own buffers
-   anyway, I could do that first then allocate the whole thing.
+ - Once I'm given the values to be encoded, I could allocate a buffer
+   to size. A complication is tables (and arrays, though they only
+   appear inside tables), for which the size can only be calculated
+   with an encoding pass. Still, since I encode those into their own
+   buffers anyway, I could do that first then allocate the whole
+   thing.
    
  - Similarly, encoding frames or even series of frames into a single
    buffer is bound to be more efficient than encoding pieces into
@@ -195,26 +212,22 @@ Another benefit of a machine-readable protocol specification is that I
 can generate test cases. I do so using [claire][], a property-based
 testing library. I have to define all the base types:
 
-<script src="https://gist.github.com/squaremo/7373943.js?file=base_types.js">
-</script>
+{% gist squaremo/7373943 base_types.js %}
 
 The sum combinator `claire.choice`, has derivatives `claire.Object`
 and `claire.Array`, which I can use for field-tables and field-arrays
 respectively:
 
-<script src="https://gist.github.com/squaremo/7373943.js?file=sum_types.js">
-</script>
+{% gist squaremo/7373943 sum_types.js %}
 
 With the product combinator `claire.sequence`, I can use the
 specification to generate the methods, frames, and so on.
 
-<script src="https://gist.github.com/squaremo/7373943.js?file=product_types.js">
-</script>
+{% gist squaremo/7373943 product_types.js %}
 
 Now that I have representations of the methods, I can construct traces of frames, and test that they are encoded and parsed correctly.
 
-<script src="https://gist.github.com/squaremo/7373943.js?file=test_trace.js">
-</script>
+{% gist squaremo/7373943 test_trace.js %}
 
 In the above, each generated trace is encoded, then partitioned into
 chunks in different ways, to make sure the parsing code deals with
@@ -271,3 +284,4 @@ AMQP authors.
 [bitsyntax]: https://github.com/squaremo/bitsyntax-js/
 [amqplib-generate]: https://github.com/squaremo/amqp.node/blob/b33afef6763011637e9fa9bed133351383a9823b/bin/generate-defs.js
 [claire]: https://github.com/hifivejs/claire
+[amqp-json]: https://raw.github.com/rabbitmq/rabbitmq-codegen/rabbitmq_v3_1_3/amqp-rabbitmq-0.9.1.json

@@ -25,8 +25,7 @@ are supposed to hang around, so other objects can be based on them.
 
 Anyway, yes hello. Examples of multiple dispatch.
 
-<script src="https://gist.github.com/squaremo/5305729.js?file=types.js">
-</script>
+{% gist squaremo/5305729 types.js %}
 
 This first one is for decoding JSON values. The scheme is pretty easy
 to figure out: a '!' property in the JSON value is a kind of reader
@@ -40,8 +39,7 @@ This could all be done with a single function, of course. However,
 this way I can add a special type elsewhere in the code, which would
 otherwise require some kind of registration mechanism.
 
-<script src="https://gist.github.com/squaremo/5305729.js?file=widgetize.js">
-</script>
+{% gist squaremo/5305729 widgetize.js %}
 
 This example is a procedure for making a widget (something that will
 be rendered into the web page) given a value of the kind decoded in
@@ -92,8 +90,7 @@ polymorphic procedure (say `indexOf`).
 Again, this opens up the possibility of adding kinds of widget
 elsewhere. And in fact, in another file, I have these:
 
-<script src="https://gist.github.com/squaremo/5305729.js?file=repl.js">
-</script>
+{% gist squaremo/5305729 repl.js %}
 
 These are special values that aren't from encoded JSON; `Waiting`, for
 example, is just a placeholder value (it's rendered to one of those
