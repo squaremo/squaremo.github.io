@@ -3,3 +3,7 @@ url: http://www.squaremobius.net
 description: Mostly computer
 author: Michael Bridgen
 copyright: 2013 Michael Bridgen
+markdown: redcarpet
+redcarpet:
+  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink",
+  "tables", "with_toc_data"]
